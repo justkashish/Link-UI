@@ -1,0 +1,181 @@
+/* General navbar styles */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: white;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.navbar-left h2 {
+    margin: 0;
+    color: #181820;
+}
+
+.navbar-left p {
+    margin: 0;
+    color: #878BA9;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.search-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    justify-content: center;
+    box-shadow: 0px 1px 2px 0px #1018280D;
+    border: 1px solid #ECECF2;
+    padding-top: 8px;
+    padding-left: 10px;
+    border-radius: 6px;
+    margin-right: 20px;
+    margin-top: 8px;
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    padding: 2px;
+    color: #878BA9;
+}
+
+.search-bar svg {
+    color: #878BA9;
+}
+
+.create-button {
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: white;
+    background-color: #1B48DA;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 20px;
+    border: 1px solid #1B48DA
+}
+
+.create-button:hover {
+    background-color: #0056b3;
+}
+
+
+/* Profile picture container */
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #FDE48A;
+    color: #923E0E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    position: relative;
+    cursor: pointer;
+}
+
+
+/* Logout button */
+
+.logout-btn {
+    display: none;
+    /* Initially hidden */
+    position: absolute;
+    top: 100%;
+    /* Position it below the profile picture */
+    /* left: 50%; */
+    transform: translateX(-50%);
+    background-color: white;
+    color: #878BA9;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 8px;
+    padding: 10px;
+    margin-left: 15px;
+    transition: opacity 0.2s ease-in-out;
+    border: 1px solid #ECECF2;
+    border-radius: 6px;
+}
+
+.logout-btn :hover {
+    background-color: #181820;
+}
+
+
+/* Show the logout button when state is true */
+
+.profile-pic .logout-btn {
+    display: block;
+}
+
+
+/* Media Queries for Responsiveness */
+
+@media screen and (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        padding: 15px;
+    }
+    .navbar-left {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .navbar-right {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 10px;
+        flex-direction: column;
+    }
+    .search-bar {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    .create-button {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    .profile-pic {
+        margin-top: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .navbar-left h2 {
+        font-size: 18px;
+    }
+    .navbar-left p {
+        font-size: 14px;
+    }
+    .create-button {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+    .search-bar input {
+        font-size: 14px;
+    }
+    .profile-pic {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+    .logout-btn {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+}
