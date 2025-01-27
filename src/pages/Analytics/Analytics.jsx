@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearch } from "../../context/SearchContext";
-import "./analytics.css";
+import "./Analytics.css";
 
 export default function Analytics() {
   const { searchQuery } = useSearch(); // Get the search query from context
