@@ -20,26 +20,37 @@ export default function Settings() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/profile`)
+      const token = localStorage.getItem("token"); // Retrieve the token from local storage
+  
+      const response = await fetch(`${uri}/api/v1/profile`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include the authorization token
+          'Content-Type': 'application/json'
+        }
+      });
+  
       if (!response.ok) {
-        throw new Error("Failed to fetch profile")
+        throw new Error("Failed to fetch profile");
       }
-      const data = await response.json()
+  
+      const data = await response.json();
       setFormData({
         name: data.name,
         email: data.email,
         mobile: data.mobile,
-      })
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to load profile data. Please refresh the page.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsInitialLoading(false)
+      setIsInitialLoading(false);
     }
-  }
+  };
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
