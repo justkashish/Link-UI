@@ -81,7 +81,7 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
         const response = await fetch(`${uri}/api/v1/link/create`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+           
             Authorization: `Bearer ${token}`, // Add token to header for authentication
           },
           body: JSON.stringify(data),
