@@ -5,6 +5,7 @@ import { toast } from "react-toastify"
 import "./Settings.css"
 
 export default function Settings() {
+    const uri = `${import.meta.env.VITE_BACKEND_URL}`;
   const [isLoading, setIsLoading] = useState(false)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [formData, setFormData] = useState({
@@ -53,7 +54,7 @@ export default function Settings() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/profile/update`, {
+      const response = await fetch(`${uri}/api/v1/profile/update`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +89,7 @@ export default function Settings() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/profile/delete", {
+      const response = await fetch(`${uri}/api/v1/profile/delete`, {
         method: "DELETE",
       })
 

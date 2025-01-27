@@ -4,8 +4,9 @@ import {ToastContainer} from 'react-toastify'
 import { handleError, handleSuccess } from '../../utils';
 import './Signup.css';
 import cuvette from '../../assets/cuvette.png';
+import { UTurnRight } from '@mui/icons-material';
  function Signup() {
-
+  const uri = `${import.meta.env.VITE_BACKEND_URL}`;
     const[signupInfo , setSignupInfo] = useState({
         name : '',
         email: '',
@@ -37,7 +38,7 @@ import cuvette from '../../assets/cuvette.png';
         const payload = { name, email, password, mobileNo,confirmPassword };
 
         try {
-           const url = `${process.env.REACT_APP_BACKEND_URL}/api/v1/auth/signup` ;
+           const url = `${uri}/api/v1/auth/signup` ;
            const response = await fetch(url, {
             method: "POST",
             headers: {

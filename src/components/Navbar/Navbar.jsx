@@ -9,7 +9,7 @@ import NewLinkModal from "../NewLinkModal/NewLinkModal";
 import { handleSuccess } from "../../utils";
 
 const Navbar = () => {
-
+  const uri = `${import.meta.env.VITE_BACKEND_URL}`;
   const { updateSearchQuery } = useSearch(); // Get updateSearchQuery function from context
   const [query, setQuery] = useState(''); // Local state for search input
 
@@ -67,7 +67,7 @@ const Navbar = () => {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/profile`, {
+        const response = await fetch(`${uri}/api/v1/profile`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

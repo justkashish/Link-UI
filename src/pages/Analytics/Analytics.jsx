@@ -3,6 +3,7 @@ import { useSearch } from "../../context/SearchContext";
 import "./Analytics.css";
 
 export default function Analytics() {
+  const uri = `${import.meta.env.VITE_BACKEND_URL}`;
   const { searchQuery } = useSearch(); // Get the search query from context
   const [data, setData] = useState([]);  // To store analytics data
   const [currentPage, setCurrentPage] = useState(1);  // Current page for pagination
@@ -14,7 +15,7 @@ export default function Analytics() {
   const fetchAnalytics = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/link/getAnalytics?timestampOrder=${sortOrder}&search=${searchQuery}&page=${currentPage}`,
+        `${uri}/api/v1/link/getAnalytics?timestampOrder=${sortOrder}&search=${searchQuery}&page=${currentPage}`,
         {
           method: "GET",
           headers: {

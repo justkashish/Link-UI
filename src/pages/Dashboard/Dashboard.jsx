@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import "./Dashboard.css"
 
 export default function Dashboard() {
+  const uri = `${import.meta.env.VITE_BACKEND_URL}`;
   const [data, setData] = useState({
     totalClicks: 0,
     dateWiseClicks: [],
@@ -13,7 +14,7 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem("token"); // Retrieve the token from localStorage
   
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/linkStats/getClickStats`, {
+      const response = await fetch(`${uri}/api/v1/linkStats/getClickStats`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

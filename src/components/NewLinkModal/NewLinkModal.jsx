@@ -15,6 +15,7 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import {toast} from 'react-toastify';
 
 function NewLinkModal({ isOpen, onClose, onSubmit }) {
+  const uri = `${import.meta.env.VITE_BACKEND_URL}`;
   const [formData, setFormData] = useState({
     destinationUrl: "",
     remarks: "",
@@ -77,7 +78,7 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
 
       try {
         // Send POST request to create new link
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/link/create`, {
+        const response = await fetch(`${uri}/api/v1/link/create`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

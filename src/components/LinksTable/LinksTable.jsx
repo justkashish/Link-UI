@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css"
 import "../LinksTable/LinksTable.css"
 
 function LinksTable() {
+  const uri = `${import.meta.env.VITE_BACKEND_URL}`;
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
   const [copiedLink, setCopiedLink] = useState(null)
@@ -71,7 +72,7 @@ function LinksTable() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/link/delete/${id}`, {
+      const response = await fetch(`${uri}/api/v1/link/delete/${id}`, {
         method: "DELETE",
       })
 

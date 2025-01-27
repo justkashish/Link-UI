@@ -7,7 +7,8 @@ import './Login.css';
 
 
 function Login() {
-    const[loginInfo , setLoginInfo] = useState({
+  const uri = `${import.meta.env.VITE_BACKEND_URL}`;
+  const[loginInfo , setLoginInfo] = useState({
         email: '',
         password: ''
     });
@@ -20,15 +21,17 @@ function Login() {
          setLoginInfo(copyLoginInfo);
     }
     
-
     const handleLogin = async (e) => {
+      console.log("123")
         e.preventDefault();
+        console.log("345")
         const { email , password} = loginInfo;
+        console.log(`${uri}/api/v1/auth/login`)
         if( !email || !password){
             return handleError('All fields are required.')
         }
         try {
-           const url = `${process.env.REACT_APP_BACKEND_URL}/api/v1/auth/login` ;
+           const url = `${uri}/api/v1/auth/login` ;
            const response = await fetch(url,{
             method: "POST",
             headers: {
