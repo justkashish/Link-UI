@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useSearch } from "../../context/SearchContext";
 import { useNavigate } from "react-router-dom";
 import { FaSun, FaMoon, FaCloudSun, FaPlus } from "react-icons/fa";
 import search from '../../assets/Frame (1).svg';
@@ -8,6 +9,10 @@ import NewLinkModal from "../NewLinkModal/NewLinkModal";
 import { handleSuccess } from "../../utils";
 
 const Navbar = () => {
+
+  const { updateSearchQuery } = useSearch(); // Get updateSearchQuery function from context
+  const [query, setQuery] = useState(''); // Local state for search input
+
   const currentTime = new Date();
   const hours = currentTime.getHours();
   const greetings =
@@ -20,7 +25,7 @@ const Navbar = () => {
     hours < 12 ? (
       <FaSun color="yellow" /> 
     ) : hours < 18 ? (
-      <FaCloudSun  />
+      <FaCloudSun color="yellow"  />
     ) : (
       <FaMoon />
     );
@@ -59,12 +64,43 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setLoggedInUser(localStorage.getItem("loggedInUser"));
-  }, []);
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem('token'); // Retrieve the token from local storage
+        const response = await fetch("http://localhost:8080/api/v1/profile", {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        const result = await response.json();
+        if (result.success) {
+          setLoggedInUser(result.data.name);
+        } else {
+          console.error("Failed to fetch user profile");
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  } , []);
 
   const handleLogoutToggle = () => {
-    setIsLogoutVisible(!isLogoutVisible); // Toggle the visibility of logout button
+    setIsLogoutVisible(!isLogoutVisible ); // Toggle the visibility of logout button
   };
+
+  const handleNewLinkSubmit = (linkData) => {
+    console.log("Received data from modal:", linkData);
+    // Perform any action with the link data (e.g., send it to the backend)
+  };
+
+  const handleSearchIconClick = () => {
+    updateSearchQuery(query); // Update the search query in context
+  };
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleLogout = (e) => {
@@ -94,12 +130,14 @@ const Navbar = () => {
         </button>
         <NewLinkModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setIsModalOpen(false)} onSubmit={handleNewLinkSubmit}
         />
         <div className="search-bar">
-      <img src={search} />
-          <input type="text" placeholder="Search by Remarks" />
+      <img src={search} onClick={handleSearchIconClick}  />
+          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by Remarks" />
         </div>
+
+
         <div className="profile-pic" onClick={handleLogoutToggle}>
           {loggedInUser.charAt(0).toUpperCase()}
           {loggedInUser.charAt(1).toUpperCase()}

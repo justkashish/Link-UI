@@ -7,11 +7,12 @@ import RefreshHandler from './RefreshHandler';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Links from './pages/Links/Links';
-// import Settings from './pages/Settings/Settings';
+import Settings from './pages/Settings/Settings';
 import Analytics from './pages/Analytics/Analytics'
 
 function App() {
  const [isAuthenticated , setIsAuthenticated] = useState(false);
+ const [searchQuery, setSearchQuery] = useState("");
 
 
   const PrivateRoute = ({element})=>{
@@ -30,8 +31,8 @@ function App() {
         <Route index element={<Dashboard />} />
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='links' element={<Links />} />
-          {/* <Route path='settings' element={<Settings />} /> */}
-          <Route path='analytics' element={<Analytics />} />
+          <Route path='settings' element={<Settings />} />
+          <Route path='analytics' element={<Analytics searchQuery={searchQuery} />} />
         </Route>
         </Routes>
     </div>

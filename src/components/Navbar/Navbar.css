@@ -1,12 +1,15 @@
-/* General navbar styles */
-
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: 15px;
     background-color: white;
     border-bottom: 1px solid #e0e0e0;
+    width: 85%;
+    height: 10%;
+    position: fixed;
+    top: 0;
+    z-index: 1;
 }
 
 .navbar-left h2 {
@@ -28,16 +31,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
     gap: 12px;
     justify-content: center;
     box-shadow: 0px 1px 2px 0px #1018280D;
     border: 1px solid #ECECF2;
-    padding-top: 8px;
-    padding-left: 10px;
     border-radius: 6px;
-    margin-right: 20px;
-    margin-top: 8px;
+    margin-left: 5px;
+    padding-top: 5px;
 }
 
 .search-bar input {
@@ -56,13 +56,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 16px;
+    font-size: 15px;
     color: white;
     background-color: #1B48DA;
     border-radius: 6px;
     cursor: pointer;
-    margin-right: 20px;
-    border: 1px solid #1B48DA
+    margin-right: 18px;
+    border: 1px solid #1B48DA;
 }
 
 .create-button:hover {
@@ -70,7 +70,7 @@
 }
 
 
-/* Profile picture container */
+/* Profile Picture Container */
 
 .profile-pic {
     width: 40px;
@@ -84,14 +84,14 @@
     font-size: 18px;
     position: relative;
     cursor: pointer;
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
 
-/* Logout button */
+/* Logout Button */
 
 .logout-btn {
-    display: none;
-    /* Initially hidden */
     position: absolute;
     top: 100%;
     /* Position it below the profile picture */
@@ -111,71 +111,6 @@
     border-radius: 6px;
 }
 
-.logout-btn :hover {
+.logout-btn:hover {
     background-color: #181820;
-}
-
-
-/* Show the logout button when state is true */
-
-.profile-pic .logout-btn {
-    display: block;
-}
-
-
-/* Media Queries for Responsiveness */
-
-@media screen and (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        padding: 15px;
-    }
-    .navbar-left {
-        text-align: center;
-        margin-bottom: 15px;
-    }
-    .navbar-right {
-        width: 100%;
-        justify-content: space-between;
-        margin-top: 10px;
-        flex-direction: column;
-    }
-    .search-bar {
-        width: 100%;
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-    .create-button {
-        width: 100%;
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-    .profile-pic {
-        margin-top: 10px;
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .navbar-left h2 {
-        font-size: 18px;
-    }
-    .navbar-left p {
-        font-size: 14px;
-    }
-    .create-button {
-        font-size: 14px;
-        padding: 8px 15px;
-    }
-    .search-bar input {
-        font-size: 14px;
-    }
-    .profile-pic {
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
-    }
-    .logout-btn {
-        font-size: 12px;
-        padding: 5px 8px;
-    }
 }

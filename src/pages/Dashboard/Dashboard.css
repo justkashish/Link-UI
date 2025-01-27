@@ -1,0 +1,64 @@
+.dashboard {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.total-clicks {
+    margin-bottom: 2rem;
+}
+
+.total-clicks h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.click-count {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #0066ff;
+}
+
+.charts-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.chart-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    margin: 0 0 1.5rem 0;
+}
+
+.chart-wrapper {
+    height: 200px;
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 1rem;
+    }
+    .charts-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .chart-card {
+        padding: 1rem;
+    }
+}

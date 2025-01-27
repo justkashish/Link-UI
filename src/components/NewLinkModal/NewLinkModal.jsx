@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import {toast} from 'react-toastify';
 
 function NewLinkModal({ isOpen, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
     expirationDate: new Date(),
   });
   const [errors, setErrors] = useState({ destinationUrl: false, remarks: false });
+  const token = localStorage.getItem("token"); // Get the token from localStorage
 
   useEffect(() => {
     if (!isOpen) {
@@ -56,8 +58,10 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate the form data
     const newErrors = {
       destinationUrl: !formData.destinationUrl,
       remarks: !formData.remarks,
@@ -65,15 +69,42 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
     setErrors(newErrors);
 
     if (!newErrors.destinationUrl && !newErrors.remarks) {
-      console.log("Submitting form data:", formData);
-      // onSubmit(formData); // Pass form data to parent for backend submission
-      setFormData({
-        destinationUrl: "",
-        remarks: "",
-        isExpirationEnabled: false,
-        expirationDate: new Date(),
-      }); // Clear form after submission
-      onClose();
+      const data = {
+        url: formData.destinationUrl,
+        remark: formData.remarks,
+        expirationDate: formData.isExpirationEnabled ? formData.expirationDate : null,
+      };
+
+      try {
+        // Send POST request to create new link
+        const response = await fetch("http://localhost:8080/api/v1/link/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Add token to header for authentication
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          toast.success("Link created successfully");
+          onSubmit(result.data); // Call onSubmit to pass the data back to the parent component
+          setFormData({
+            destinationUrl: "",
+            remarks: "",
+            isExpirationEnabled: false,
+            expirationDate: new Date(),
+          }); // Reset form
+          onClose(); // Close modal
+        } else {
+          toast.error(result.message || "Failed to create link");
+        }
+      } catch (error) {
+        console.error("Error creating link:", error);
+        toast.error("Failed to create link");
+      }
     }
   };
 
