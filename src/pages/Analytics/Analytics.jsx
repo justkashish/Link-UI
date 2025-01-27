@@ -14,7 +14,7 @@ export default function Analytics() {
   const fetchAnalytics = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/link/getAnalytics?timestampOrder=${sortOrder}&search=${searchQuery}&page=${currentPage}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/link/getAnalytics?timestampOrder=${sortOrder}&search=${searchQuery}&page=${currentPage}`,
         {
           method: "GET",
           headers: {

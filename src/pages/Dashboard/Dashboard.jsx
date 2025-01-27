@@ -13,7 +13,7 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem("token"); // Retrieve the token from localStorage
   
-      const response = await fetch("http://localhost:8080/api/v1/linkStats/getClickStats", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/linkStats/getClickStats`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

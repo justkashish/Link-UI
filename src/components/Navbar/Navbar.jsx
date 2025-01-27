@@ -67,7 +67,7 @@ const Navbar = () => {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        const response = await fetch("http://localhost:8080/api/v1/profile", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/profile`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

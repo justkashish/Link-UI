@@ -37,7 +37,7 @@ import cuvette from '../../assets/cuvette.png';
         const payload = { name, email, password, mobileNo,confirmPassword };
 
         try {
-           const url = "http://localhost:8080/api/v1/auth/signup" ;
+           const url = `${process.env.REACT_APP_BACKEND_URL}/api/v1/auth/signup` ;
            const response = await fetch(url, {
             method: "POST",
             headers: {

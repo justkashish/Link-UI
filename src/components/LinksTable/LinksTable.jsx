@@ -16,7 +16,7 @@ function LinksTable() {
       try {
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
         console.log(token)
-        const response = await fetch("http://localhost:8080/api/v1/link/getAllLinks", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/link/getAllLinks`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}` // Add the token to the headers
@@ -71,7 +71,7 @@ function LinksTable() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/link/delete/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/link/delete/${id}`, {
         method: "DELETE",
       })
 

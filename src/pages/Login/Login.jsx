@@ -28,7 +28,7 @@ function Login() {
             return handleError('All fields are required.')
         }
         try {
-           const url = "http://localhost:8080/api/v1/auth/login" ;
+           const url = `${process.env.REACT_APP_BACKEND_URL}/api/v1/auth/login` ;
            const response = await fetch(url,{
             method: "POST",
             headers: {

@@ -19,7 +19,7 @@ export default function Settings() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/profile")
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/profile`)
       if (!response.ok) {
         throw new Error("Failed to fetch profile")
       }
@@ -53,7 +53,7 @@ export default function Settings() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/profile/update", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/profile/update`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
