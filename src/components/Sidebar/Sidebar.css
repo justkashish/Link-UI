@@ -92,6 +92,9 @@
 /* Media Queries for Responsiveness */
 
 @media screen and (max-width: 768px) {
+    .cuvette-image {
+        display: none;
+    }
     .sidebar {
         transform: translateX(-100%);
     }
@@ -100,6 +103,7 @@
     }
     .hamburger-menu {
         display: block;
+        z-index: 5;
     }
     .dash {
         padding-top: 80px;

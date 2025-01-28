@@ -1,27 +1,50 @@
-import { useState , useEffect } from "react"
-import { Pencil, Trash2, Copy, Check } from "lucide-react"
-import { ToastContainer, toast } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
-import "../LinksTable/LinksTable.css"
+import React, { useState, useEffect } from "react";
+import {
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { ToastContainer } from "react-toastify";
+import { handleError, handleSuccess } from "../../utils";
+import "react-toastify/dist/ReactToastify.css";
+import "../LinksTable/LinksTable.css";
+import DeleteConfirmationModal from "../DeleteConfirmationModal/DeleteConfirmationModal";
+import EditLinkModal from "../EditLinkModal/EditLinkModal";
+import copyIcon from "../../assets/copy.svg";
+import deleteIcon from "../../assets/delete.svg";
+import editIcon from "../../assets/edit.svg";
+import checkIcon from "../../assets/checkIcon.svg";
 
-function LinksTable() {
+function LinksTable({ openDeleteModal }) {
   const uri = `${import.meta.env.VITE_BACKEND_URL}`;
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10)
-  const [copiedLink, setCopiedLink] = useState(null)
-  const [links, setLinks] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [copiedLink, setCopiedLink] = useState(null);
+  const [links, setLinks] = useState([]);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [selectedLinkId, setSelectedLinkId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = links.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(links.length / itemsPerPage);
+  const [sortConfig, setSortConfig] = useState({
+    key: "timestamp",
+    direction: "desc",
+  });
 
   useEffect(() => {
     const fetchLinks = async () => {
       try {
-        const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        console.log(token)
         const response = await fetch(`${uri}/api/v1/link/getAllLinks`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Authorization': `Bearer ${token}` // Add the token to the headers
-          }
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         });
 
         const result = await response.json();
@@ -35,10 +58,9 @@ function LinksTable() {
             remarks: item.remark,
             clicks: item.totalClicks,
             status: item.status,
+            rawDate: new Date(item.createdAt),
           }));
           setLinks(linksData);
-          console.log("Links fetched succesfully")
-          console.log(linksData)
         } else {
           toast.error(result.message || "Failed to fetch links");
         }
@@ -51,48 +73,205 @@ function LinksTable() {
     };
 
     fetchLinks();
-}, []);
+  }, []);
 
+  const sortData = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
 
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = links.slice(indexOfFirstItem, indexOfLastItem)
-  const totalPages = Math.ceil(links.length / itemsPerPage)
+    const sortedLinks = [...links].sort((a, b) => {
+      if (key === "timestamp") {
+        return direction === "asc"
+          ? a.rawDate - b.rawDate
+          : b.rawDate - a.rawDate;
+      }
+      if (key === "status") {
+        return direction === "asc"
+          ? a.status.localeCompare(b.status)
+          : b.status.localeCompare(a.status);
+      }
+      return 0;
+    });
+
+    setLinks(sortedLinks);
+  };
+
+  const SortIcon = ({ columnKey }) => {
+    const isActive = sortConfig.key === columnKey;
+    return (
+      <span className="sort-icons">
+        <ChevronUp
+          className={`sort-icon ${
+            isActive && sortConfig.direction === "asc" ? "active" : ""
+          }`}
+          size={12}
+        />
+        <ChevronDown
+          className={`sort-icon ${
+            isActive && sortConfig.direction === "desc" ? "active" : ""
+          }`}
+          size={12}
+        />{" "}
+      </span>
+    );
+  };
 
   const copyToClipboard = async (text, type) => {
     try {
-      await navigator.clipboard.writeText(text)
-      setCopiedLink(text)
-      toast.success(`${type} copied to clipboard!`)
-      setTimeout(() => setCopiedLink(null), 2000)
+      await navigator.clipboard.writeText(text);
+      setCopiedLink(text);
+      handleSuccess(`${type} copied to clipboard!`);
+      setTimeout(() => setCopiedLink(null), 2000);
     } catch (err) {
-      toast.error("Failed to copy link")
+      handleError("Failed to copy link");
     }
+  };
+
+  const truncateText = (text, maxLength = 50) => {
+    if (text.length <= maxLength) return text;
+    return `${text.substring(0, maxLength)}...`;
+  };
+
+  const handleDeleteClick = (id) => {
+    setSelectedLinkId(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleEditClick = (id) =>{
+    setModalOpen(true);
   }
 
-  const handleDelete = async (id) => {
+  const handleDeleteConfirm = async () => {
     try {
-      const response = await fetch(`${uri}/api/v1/link/delete/${id}`, {
-        method: "DELETE",
-      })
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${uri}/api/v1/link/delete/${selectedLinkId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
-        setLinks(links.filter((link) => link.id !== id))
-        toast.success("Link deleted successfully")
+        setLinks(links.filter((link) => link.id !== selectedLinkId));
+        handleSuccess("Link deleted successfully");
+      } else {
+        const result = await response.json();
+        handleError(result.message || "Failed to delete the link");
       }
     } catch (error) {
-      toast.error("Failed to delete link")
+      console.error("Error deleting link:", error);
+      handleError("Failed to delete the link");
+    } finally {
+      setDeleteModalOpen(false);
     }
-  }
+  };
+
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxVisibleButtons = 5;
+
+    buttons.push(
+      <button
+        key="prev"
+        className="pagination-button"
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1}
+      >
+        <ChevronLeft size={16} />
+      </button>
+    );
+
+    let startPage = Math.max(
+      1,
+      currentPage - Math.floor(maxVisibleButtons / 2)
+    );
+    const endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+
+    if (endPage - startPage + 1 < maxVisibleButtons) {
+      startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+    }
+
+    if (startPage > 1) {
+      buttons.push(
+        <button
+          key={1}
+          className={`pagination-button ${currentPage === 1 ? "active" : ""}`}
+          onClick={() => setCurrentPage(1)}
+        >
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        buttons.push(
+          <span key="ellipsis1" className="pagination-ellipsis">
+            ...
+          </span>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          className={`pagination-button ${currentPage === i ? "active" : ""}`}
+          onClick={() => setCurrentPage(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        buttons.push(
+          <span key="ellipsis2" className="pagination-ellipsis">
+            ...
+          </span>
+        );
+      }
+      buttons.push(
+        <button
+          key={totalPages}
+          className={`pagination-button ${
+            currentPage === totalPages ? "active" : ""
+          }`}
+          onClick={() => setCurrentPage(totalPages)}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    buttons.push(
+      <button
+        key="next"
+        className="pagination-button"
+        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        disabled={currentPage === totalPages}
+      >
+        <ChevronRight size={16} />
+      </button>
+    );
+
+    return buttons;
+  };
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
     <div className="table-container">
       <ToastContainer
-        position="top-right"
+        position="left-bottom"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop
@@ -104,16 +283,26 @@ function LinksTable() {
         theme="light"
       />
 
-<div className="table-wrapper">
+      <div className="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th className="date-column">Date</th>
+              <th
+                className="date-column cursor-pointer"
+                onClick={() => sortData("timestamp")}
+              >
+                Date <SortIcon columnKey="timestamp" />
+              </th>
               <th>Original Link</th>
               <th>Short Link</th>
-              <th>Remarks</th>
+              <th className="remarks-column">Remarks</th>
               <th className="clicks-column">Clicks</th>
-              <th className="status-column">Status</th>
+              <th
+                className="status-column cursor-pointer"
+                onClick={() => sortData("status")}
+              >
+                Status <SortIcon columnKey="status" />
+              </th>
               <th className="action-column">Action</th>
             </tr>
           </thead>
@@ -123,52 +312,75 @@ function LinksTable() {
                 <td>{link.timestamp}</td>
                 <td className="link-cell">
                   <div className="link-cell-content">
-                    {link.originalLink}
-                    <button
-                      className="button-ghost h-8 w-8"
-                      onClick={() => copyToClipboard(link.originalLink, "Original link")}
-                    >
-                      {copiedLink === link.originalLink ? (
-                        <Check className="h-4 w-4 copy-success" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </button>
+                    <span className="original-link" title={link.originalLink}>
+                      {truncateText(link.originalLink, 50)}
+                    </span>
                   </div>
                 </td>
                 <td className="link-cell">
                   <div className="link-cell-content">
-                    {link.shortLink}
-                    <button
-                      className="button-ghost h-8 w-8"
-                      onClick={() => copyToClipboard(link.shortLink, "Short link")}
+                    <span
+                      className="link-text"
+                      onClick={() =>
+                        copyToClipboard(link.shortLink, "Short link")
+                      }
+                      title={link.shortLink} // Show full URL on hover
                     >
-                      {copiedLink === link.shortLink ? (
-                        <Check className="h-4 w-4 copy-success" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </button>
+                      {truncateText(link.shortLink, 30)}
+                    </span>
+                    <div className="action-buttons">
+                      <img
+                        src={
+                          copiedLink === link.shortLink ? checkIcon : copyIcon
+                        }
+                        alt={copiedLink === link.shortLink ? "Copied" : "Copy"}
+                        className="h-6 w-6 cursor-pointer"
+                        title={
+                          copiedLink === link.shortLink
+                            ? "Link copied!"
+                            : "Copy short link"
+                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyToClipboard(link.shortLink, "Short link");
+                        }}
+                      />
+                    </div>
                   </div>
                 </td>
-                <td>{link.remarks}</td>
+                <td className="remarks-column">
+                  <span title={link.remarks}>
+                    {truncateText(link.remarks, 20)}
+                  </span>
+                </td>
                 <td className="clicks-cell">{link.clicks}</td>
                 <td>
-                  <span className={`status-badge ${link.status === "Active" ? "status-active" : "status-inactive"}`}>
+                  <span
+                    className={`status-badge ${
+                      link.status === "Active"
+                        ? "status-active"
+                        : "status-inactive"
+                    }`}
+                  >
                     {link.status}
                   </span>
                 </td>
                 <td>
                   <div className="action-buttons">
-                    <button className="button-ghost h-8 w-8">
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
-                      className="button-ghost h-8 w-8"
-                      onClick={() => handleDelete(link.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <img
+                      src={editIcon}
+                      alt="Edit"
+                      className="h-6 w-6 cursor-pointer"
+                      title="Edit"
+                      onClick={() => handleEditClick(link.id)}
+                    />
+                    <img
+                      src={deleteIcon}
+                      alt="Delete"
+                      className="h-6 w-6 cursor-pointer"
+                      title="Delete"
+                      onClick={() => handleDeleteClick(link.id)}
+                    />
                   </div>
                 </td>
               </tr>
@@ -177,243 +389,26 @@ function LinksTable() {
         </table>
       </div>
 
-      <div className="pagination-container">
-        <button
-          className="button-outline"
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-          <button
-            key={page}
-            className={`button-outline ${currentPage === page ? "button-default" : ""}`}
-            onClick={() => setCurrentPage(page)}
-          >
-            {page}
-          </button>
-        ))}
-        <button
-          className="button-outline"
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+      <div className="pagination-container">{renderPaginationButtons()}</div>
+
+      
+
+      <EditLinkModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={(updatedLink) => {
+          // Handle the updated link data
+          console.log(updatedLink);
+        }}
+        linkId="your-link-id"
+      />
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
-  )
+  );
 }
 
-export default LinksTable
-
-
-
-// import { useState , useEffect } from "react"
-// import { Pencil, Trash2, Copy, Check } from "lucide-react"
-// import { ToastContainer, toast } from "react-toastify"
-// import "react-toastify/dist/ReactToastify.css"
-// import "../LinksTable/LinksTable.css"
-
-// function LinksTable() {
-//   const [currentPage, setCurrentPage] = useState(1)
-//   const [itemsPerPage] = useState(10)
-//   const [copiedLink, setCopiedLink] = useState(null)
-//   const [links, setLinks] = useState([])
-//   const [loading, setLoading] = useState(true)
-
-//   useEffect(() => {
-//     const fetchLinks = async () => {
-//       try {
-//         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-
-//         const response = await fetch("http://localhost:8080/api/v1/link/getAllLinks", {
-//           method: 'GET',
-//           headers: {
-//             'Authorization': `Bearer ${token}` // Add the token to the headers
-//           }
-//         });
-
-//         const result = await response.json();
-
-//         if (result.success) {
-//           const linksData = result.data.items.map((item) => ({
-//             id: item._id,
-//             timestamp: new Date(item.createdAt).toLocaleDateString(),
-//             originalLink: item.url,
-//             shortLink: item.shortUrl,
-//             remarks: item.remark,
-//             clicks: item.totalClicks,
-//             status: item.status,
-//           }));
-//           setLinks(linksData);
-//           console.log("Links fetched succesfully")
-//           console.log(linksData)
-//         } else {
-//           toast.error(result.message || "Failed to fetch links");
-//         }
-//         setLoading(false);
-//       } catch (error) {
-//         console.error("Error fetching links:", error);
-//         toast.error("Failed to fetch links");
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchLinks();
-// }, []);
-
-//   const indexOfLastItem = currentPage * itemsPerPage
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-//   const currentItems = links.slice(indexOfFirstItem, indexOfLastItem)
-//   const totalPages = Math.ceil(links.length / itemsPerPage)
-
-//   const copyToClipboard = async (text, type) => {
-//     try {
-//       await navigator.clipboard.writeText(text)
-//       setCopiedLink(text)
-//       toast.success(`${type} copied to clipboard!`)
-//       setTimeout(() => setCopiedLink(null), 2000)
-//     } catch (err) {
-//       toast.error("Failed to copy link")
-//     }
-//   }
-
-//   const handleDelete = async (id) => {
-//     try {
-//       const response = await fetch(`http://localhost:8080/api/v1/link/delete/${id}`, {
-//         method: "DELETE",
-//       })
-
-//       if (response.ok) {
-//         setLinks(links.filter((link) => link.id !== id))
-//         toast.success("Link deleted successfully")
-//       }
-//     } catch (error) {
-//       toast.error("Failed to delete link")
-//     }
-//   }
-
-//   if (loading) {
-//     return <div>Loading...</div>
-//   }
-
-//   return (
-//     <div className="table-container">
-//       <ToastContainer
-//         position="top-right"
-//         autoClose={3000}
-//         hideProgressBar={false}
-//         newestOnTop
-//         closeOnClick
-//         rtl={false}
-//         pauseOnFocusLoss
-//         draggable
-//         pauseOnHover
-//         theme="light"
-//       />
-
-//       <div className="table-wrapper">
-//         <table>
-//           <thead>
-//             <tr>
-//               <th className="date-column">Date</th>
-//               <th>Original Link</th>
-//               <th>Short Link</th>
-//               <th>Remarks</th>
-//               <th className="clicks-column">Clicks</th>
-//               <th className="status-column">Status</th>
-//               <th className="action-column">Action</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {currentItems.map((link) => (
-//               <tr key={link.id}>
-//                 <td>{link.timestamp}</td>
-//                 <td className="link-cell">
-//                   <div className="link-cell-content">
-//                     {link.originalLink}
-//                     <button
-//                       className="button-ghost h-8 w-8"
-//                       onClick={() => copyToClipboard(link.originalLink, "Original link")}
-//                     >
-//                       {copiedLink === link.originalLink ? (
-//                         <Check className="h-4 w-4 copy-success" />
-//                       ) : (
-//                         <Copy className="h-4 w-4" />
-//                       )}
-//                     </button>
-//                   </div>
-//                 </td>
-//                 <td className="link-cell">
-//                   <div className="link-cell-content">
-//                     {link.shortLink}
-//                     <button
-//                       className="button-ghost h-8 w-8"
-//                       onClick={() => copyToClipboard(link.shortLink, "Short link")}
-//                     >
-//                       {copiedLink === link.shortLink ? (
-//                         <Check className="h-4 w-4 copy-success" />
-//                       ) : (
-//                         <Copy className="h-4 w-4" />
-//                       )}
-//                     </button>
-//                   </div>
-//                 </td>
-//                 <td>{link.remarks}</td>
-//                 <td className="clicks-cell">{link.clicks}</td>
-//                 <td>
-//                   <span className={`status-badge ${link.status === "Active" ? "status-active" : "status-inactive"}`}>
-//                     {link.status}
-//                   </span>
-//                 </td>
-//                 <td>
-//                   <div className="action-buttons">
-//                     <button className="button-ghost h-8 w-8">
-//                       <Pencil className="h-4 w-4" />
-//                     </button>
-//                     <button
-//                       className="button-ghost h-8 w-8"
-//                       onClick={() => handleDelete(link.id)}
-//                     >
-//                       <Trash2 className="h-4 w-4" />
-//                     </button>
-//                   </div>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-
-//       <div className="pagination-container">
-//         <button
-//           className="button-outline"
-//           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-//           disabled={currentPage === 1}
-//         >
-//           Previous
-//         </button>
-//         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-//           <button
-//             key={page}
-//             className={`button-outline ${currentPage === page ? "button-default" : ""}`}
-//             onClick={() => setCurrentPage(page)}
-//           >
-//             {page}
-//           </button>
-//         ))}
-//         <button
-//           className="button-outline"
-//           onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-//           disabled={currentPage === totalPages}
-//         >
-//           Next
-//         </button>
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default LinksTable
+export default LinksTable;

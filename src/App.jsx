@@ -8,7 +8,9 @@ import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Links from './pages/Links/Links';
 import Settings from './pages/Settings/Settings';
-import Analytics from './pages/Analytics/Analytics'
+import Analytics from './pages/Analytics/Analytics';
+import LinkPage from './pages/LinkPage';
+
 
 function App() {
  const [isAuthenticated , setIsAuthenticated] = useState(false);
@@ -27,6 +29,8 @@ function App() {
         <Route path='/' element={< Navigate to ='/signup'/>} />
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
+         {/* Define the route for shortened link */}
+         {/* <Route path="/:id" element={<LinkPage />} /> */}
         <Route path='/home' element={<PrivateRoute isAuthenticated={isAuthenticated} element={<Layout />} />} >
         <Route index element={<Dashboard />} />
           <Route path='dashboard' element={<Dashboard />} />

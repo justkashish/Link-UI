@@ -1,129 +1,133 @@
-import { useState, useEffect } from "react"
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import { toast } from "react-toastify"
-import "./Settings.css"
+import { useState, useEffect } from "react";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import {ToastContainer } from "react-toastify";
+import { handleError, handleSuccess } from '../../utils';
+import "react-toastify/dist/ReactToastify.css";
+import "./Settings.css";
+import { use } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Settings() {
-    const uri = `${import.meta.env.VITE_BACKEND_URL}`;
-  const [isLoading, setIsLoading] = useState(false)
-  const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const uri = `${import.meta.env.VITE_BACKEND_URL}`;
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    mobile: "",
-  })
+    mobileNo: "",
+  });
 
   useEffect(() => {
-    fetchUserProfile()
-  }, [])
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Retrieve the token from local storage
+        console.log(token);
+        const response = await fetch(`${uri}/api/v1/profile`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the authorization token
+            "Content-Type": "application/json",
+          },
+        });
 
-  const fetchUserProfile = async () => {
-    try {
-      const token = localStorage.getItem("token"); // Retrieve the token from local storage
-  
-      const response = await fetch(`${uri}/api/v1/profile`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`, // Include the authorization token
-          'Content-Type': 'application/json'
+        if (!response.ok) {
+          throw new Error("Failed to fetch profile");
         }
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to fetch profile");
+
+        const data = await response.json();
+        console.log(data);
+        setFormData({
+          name: data.name || "",
+          email: data.email || "",
+          mobileNo: data.mobileNo || "",
+        });
+        console.log("Form data updated successfully.");
+      } catch (error) {
+        handleError("Failed to load profile data. Please refresh the page.");
+      } finally {
+        setIsInitialLoading(false);
       }
-  
-      const data = await response.json();
-      setFormData({
-        name: data.name,
-        email: data.email,
-        mobile: data.mobile,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load profile data. Please refresh the page.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsInitialLoading(false);
-    }
-  };
-  
+    };
+    fetchUserProfile();
+  }, []);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleUpdateProfile = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`${uri}/api/v1/profile/update`, {
         method: "PUT",
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      })
-
+      });
+      console.log(formData);
       if (!response.ok) {
-        throw new Error("Failed to update profile")
+        throw new Error("Failed to update profile");
       }
+      console.log("Your profile has been updated.");
 
-      toast({
-        title: "Success",
-        description: "Your profile has been updated.",
-      })
+      handleSuccess("Your profile has been updated.");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
-        variant: "destructive",
-      })
+      handleError("Failed to update profile. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      return
+    if (
+      !window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
+      const token = localStorage.getItem("token"); 
       const response = await fetch(`${uri}/api/v1/profile/delete`, {
         method: "DELETE",
-      })
+        headers: {
+          'Authorization': `Bearer ${token}`
+      }
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to delete account")
+        throw new Error("Failed to delete account");
       }
 
-      toast({
-        title: "Account Deleted",
-        description: "Your account has been successfully deleted.",
-      })
-
-      window.location.href = "/"
+      handleSuccess("Your account has been successfully deleted.");
+     localStorage.removeItem("token");
+     localStorage.removeItem("loggedInUser");
+     console.log("User Logged out successfully");
+     handleSuccess("User Logged out");
+     setTimeout(() => {
+      navigate("/login");
+    }, 1000);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete account. Please try again.",
-        variant: "destructive",
-      })
+     
+      handleError("Failed to delete account. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   if (isInitialLoading) {
     return (
@@ -134,7 +138,7 @@ export default function Settings() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -150,12 +154,11 @@ export default function Settings() {
                 value={formData.name}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Email id</label>
+              <label htmlFor="email">Email Id</label>
               <input
                 id="email"
                 name="email"
@@ -163,25 +166,27 @@ export default function Settings() {
                 value={formData.email}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="mobile">Mobile no.</label>
+              <label htmlFor="mobile">Mobile No.</label>
               <input
-                id="mobile"
-                name="mobile"
+                id="mobileNo"
+                name="mobileNo"
                 type="tel"
-                value={formData.mobile}
+                value={formData.mobileNo}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                required
               />
             </div>
 
             <div className="button-group">
-              <button type="submit" className="save-button" disabled={isLoading}>
+              <button
+                type="submit"
+                className="save-button"
+                disabled={isLoading}
+              >
                 {isLoading ? "Saving..." : "Save Changes"}
               </button>
 
@@ -196,9 +201,9 @@ export default function Settings() {
               </button>
             </div>
           </form>
+          <ToastContainer />
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-
