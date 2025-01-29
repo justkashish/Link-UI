@@ -23,7 +23,7 @@ function LinksTable({ openDeleteModal }) {
   const [copiedLink, setCopiedLink] = useState(null);
   const [links, setLinks] = useState([]);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLinkId, setSelectedLinkId] = useState(null);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
@@ -148,7 +148,8 @@ function LinksTable({ openDeleteModal }) {
   };
 
   const handleEditClick = (id) =>{
-    setModalOpen(true);
+    setSelectedLinkId(id);
+    setIsModalOpen(true);
   }
 
   const handleDeleteConfirm = async () => {
@@ -398,8 +399,6 @@ function LinksTable({ openDeleteModal }) {
 
       <div className="pagination-container">{renderPaginationButtons()}</div>
 
-      
-
       <EditLinkModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -407,7 +406,7 @@ function LinksTable({ openDeleteModal }) {
           // Handle the updated link data
           console.log(updatedLink);
         }}
-        linkId="your-link-id"
+        linkId={selectedLinkId}
       />
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}

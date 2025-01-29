@@ -30,7 +30,7 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
          {/* Define the route for shortened link */}
-         {/* <Route path="/:id" element={<LinkPage />} /> */}
+         <Route path="/:id" element={<LinkPage />} />
         <Route path='/home' element={<PrivateRoute isAuthenticated={isAuthenticated} element={<Layout />} />} >
         <Route index element={<Dashboard />} />
           <Route path='dashboard' element={<Dashboard />} />

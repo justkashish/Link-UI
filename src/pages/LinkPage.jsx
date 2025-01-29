@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const LinkPage = () => {
-  const { id } = useParams(); // Get the shortened URL ID from the URL
+  const { id } = useParams(); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const uri = `${import.meta.env.VITE_BACKEND_URL}`;
@@ -11,13 +11,15 @@ const LinkPage = () => {
     const fetchOriginalUrl = async () => {
       try {
         console.log(`Fetching original URL for id: ${id}`);
-        const response = await fetch(`${uri}/link/getUrl?id=${id}`); // Request to backend
+        const response = await fetch(
+          `${uri}/api/v1/link?id=${id}`
+        ); 
         console.log(`Response status: ${response.status}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(`Received data:`, data);
+        // console.log(Received data : , data);
 
         if (data.success) {
           console.log(`Redirecting to original URL: ${data.url}`);

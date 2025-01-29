@@ -28,13 +28,15 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
   const fetchLinkDetails = async () => {
     try {
       const response = await fetch(`${uri}/api/v1/link/${linkId}`, {
+          method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       })
 
       const result = await response.json()
-
+console.log(result);
       if (result.success) {
         setFormData({
           destinationUrl: result.data.url,
@@ -90,7 +92,7 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
       }
 
       try {
-        const response = await fetch(`${uri}/api/v1/link/${linkId}`, {
+        const response = await fetch(`${uri}/api/v1/link/edit/${linkId}`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
