@@ -23,6 +23,7 @@ export default function Dashboard() {
       });
   
       return await response.json();
+      console.log("Fetched Click Status..");
     } catch (error) {
       console.error("Error fetching analytics:", error);
       return {
