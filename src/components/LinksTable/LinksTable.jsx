@@ -52,7 +52,14 @@ function LinksTable({ openDeleteModal }) {
         if (result.success) {
           const linksData = result.data.items.map((item) => ({
             id: item._id,
-            timestamp: new Date(item.createdAt).toLocaleDateString(),
+            timestamp: new Date(item.createdAt).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: '2-digit', 
+              day: '2-digit', 
+              hour: '2-digit', 
+              minute: '2-digit',
+              hour12: false //24-hour format
+          }),
             originalLink: item.url,
             shortLink: item.shortUrl,
             remarks: item.remark,

@@ -7,6 +7,7 @@ import search from '../../assets/Frame (1).svg';
 import "./Navbar.css";
 import NewLinkModal from "../NewLinkModal/NewLinkModal";
 import { handleSuccess } from "../../utils";
+import cuvette from '../../assets/cuvette.png';
 
 const Navbar = () => {
   const uri = `${import.meta.env.VITE_BACKEND_URL}`;
@@ -16,19 +17,27 @@ const Navbar = () => {
   const currentTime = new Date();
   const hours = currentTime.getHours();
   const greetings =
-    hours < 12
-      ? " Good morning"
+    hours < 6
+      ? " Good Late Night"
+      : hours < 12
+      ? " Good Morning"
       : hours < 18
-      ? " Good afternoon"
-      : " Good evening";
-  const emoji =
-    hours < 12 ? (
-      <FaSun color="yellow" /> 
-    ) : hours < 18 ? (
-      <FaCloudSun color="yellow"  />
-    ) : (
-      <FaMoon />
-    );
+      ? " Good Afternoon"
+      : hours < 21
+      ? " Good Evening"
+      : " Good Night";
+      const emoji =
+      hours < 6 ? (
+        <FaMoon />
+      ) : hours < 12 ? (
+        <FaSun color="yellow" />
+      ) : hours < 18 ? (
+        <FaCloudSun color="yellow" />
+      ) : hours < 21 ? (
+        <FaCloudSun color="orange" />
+      ) : (
+        <FaMoon />
+      );  
 
   const days = [
     "Sunday",
@@ -57,6 +66,9 @@ const Navbar = () => {
   const day = currentTime.getDate();
   const month = monthNames[currentTime.getMonth()];
   const currentDate = `${dayOfWeek}, ${month} ${day}`;
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
 
   const [loggedInUser, setLoggedInUser] = useState("");
   const [isLogoutVisible, setIsLogoutVisible] = useState(false);
@@ -76,7 +88,7 @@ const Navbar = () => {
         });
         const result = await response.json();
         if (result.success) {
-          setLoggedInUser(result.data.name);
+          setLoggedInUser(capitalizeFirstLetter(result.data.name));
         } else {
           console.error("Failed to fetch user profile");
         }
@@ -116,10 +128,12 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <div className="navbar-left">
+      <div className="image">
+        <img src={cuvette} className="cuvette" alt="Cuvette Logo"/>
+      </div>
+      <div className="navbar-intro">
         <h2>
-          {emoji} 
-          {greetings}, {loggedInUser}
+          {emoji} {greetings}, {loggedInUser}
         </h2>
         <p>{currentDate}</p>
       </div>
@@ -133,15 +147,12 @@ const Navbar = () => {
           onClose={() => setIsModalOpen(false)} onSubmit={handleNewLinkSubmit}
         />
         <div className="search-bar">
-      <img src={search} onClick={handleSearchIconClick}  />
-          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by Remarks" />
+         <img src={search} alt="search icon" onClick={handleSearchIconClick}  />
+          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by Remark" />
         </div>
-
-
         <div className="profile-pic" onClick={handleLogoutToggle}>
           {loggedInUser.charAt(0).toUpperCase()}
           {loggedInUser.charAt(1).toUpperCase()}
-
           {/* Logout button */}
           {isLogoutVisible && (
             <button className="logout-btn" onClick={handleLogout}>

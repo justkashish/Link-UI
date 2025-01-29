@@ -9,11 +9,13 @@ const Layout = () => {
   return (
    <SearchProvider>
       <div className="layout">
-        <div className='sidebar'>
-        <Sidebar />
-        </div>
-        <div className="main-content">
+        <div className='navbar-content'>
           <Navbar />
+        </div>
+        <div className='main-content'>
+          <div className='sidebar-content'>
+           <Sidebar />
+           </div>
           <div className="page-content">
             <Outlet />
           </div>

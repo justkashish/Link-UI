@@ -1,3 +1,5 @@
+/* Navbar Styles */
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -5,18 +7,26 @@
     padding: 15px;
     background-color: white;
     border-bottom: 1px solid #e0e0e0;
-    width: 85%;
-    height: 10%;
-    position: fixed;
+    width: 100vw;
+    position: sticky;
     top: 0;
 }
 
-.navbar-left h2 {
-    margin: 0;
+.image {
+    position: fixed;
+    left: 3%;
+}
+
+.navbar-intro {
+    margin-left: 16%;
+    margin-top: 0.7%;
+}
+
+.navbar-intro h2 {
     color: #181820;
 }
 
-.navbar-left p {
+.navbar-intro p {
     margin: 0;
     color: #878BA9;
 }
@@ -30,13 +40,14 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 12px;
     justify-content: center;
     box-shadow: 0px 1px 2px 0px #1018280D;
     border: 1px solid #ECECF2;
     border-radius: 6px;
-    margin-left: 5px;
+    margin-left: 10px;
+    margin-right: 15%;
     padding-top: 5px;
+    padding-left: 8px;
 }
 
 .search-bar input {
@@ -44,10 +55,11 @@
     outline: none;
     padding: 2px;
     color: #878BA9;
+    margin-left: 0;
 }
 
-.search-bar svg {
-    color: #878BA9;
+.search-bar img {
+    cursor: pointer;
 }
 
 .create-button {
@@ -60,8 +72,9 @@
     background-color: #1B48DA;
     border-radius: 6px;
     cursor: pointer;
-    margin-right: 18px;
+    margin-right: 10px;
     border: 1px solid #1B48DA;
+    width: 47%;
 }
 
 .create-button:hover {
@@ -81,7 +94,8 @@
     justify-content: center;
     align-items: center;
     font-size: 18px;
-    position: relative;
+    position: fixed;
+    right: 0.4rem;
     cursor: pointer;
     margin-left: 15px;
     margin-right: 15px;
@@ -93,8 +107,6 @@
 .logout-btn {
     position: absolute;
     top: 100%;
-    /* Position it below the profile picture */
-    /* left: 50%; */
     transform: translateX(-50%);
     background-color: white;
     color: #878BA9;
@@ -103,13 +115,45 @@
     cursor: pointer;
     font-size: 14px;
     margin-top: 8px;
-    padding: 10px;
-    margin-left: 15px;
     transition: opacity 0.2s ease-in-out;
     border: 1px solid #ECECF2;
     border-radius: 6px;
+    z-index: 2;
 }
 
 .logout-btn:hover {
     background-color: #181820;
+    color: white;
+}
+
+
+/* Media Queries for Responsiveness */
+
+@media screen and (max-width: 768px) {
+    .image {
+        display: none;
+    }
+    .navbar-intro {
+        margin-left: 1.5%;
+        text-align: center;
+    }
+    .navbar-right {
+        flex-direction: column;
+        margin-right: 4%;
+    }
+    .search-bar {
+        margin-top: 10px;
+    }
+    .profile-pic {
+        position: absolute;
+    }
+    .create-button {
+        width: 65%;
+    }
+    .search-bar {
+        width: 80%;
+    }
+    .navbar {
+        border-bottom: 1px solid #e0e0e0;
+    }
 }
