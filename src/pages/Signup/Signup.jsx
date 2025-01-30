@@ -4,7 +4,7 @@ import {ToastContainer} from 'react-toastify'
 import { handleError, handleSuccess } from '../../utils';
 import './Signup.css';
 import cuvette from '../../assets/cuvette.png';
-import { UTurnRight } from '@mui/icons-material';
+
  function Signup() {
   const uri = `${import.meta.env.VITE_BACKEND_URL}`;
     const[signupInfo , setSignupInfo] = useState({

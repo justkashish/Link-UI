@@ -48,7 +48,7 @@ function LinksTable({ openDeleteModal }) {
         });
 
         const result = await response.json();
-
+        console.log(result)
         if (result.success) {
           const linksData = result.data.items.map((item) => ({
             id: item._id,
@@ -68,13 +68,15 @@ function LinksTable({ openDeleteModal }) {
             rawDate: new Date(item.createdAt),
           }));
           setLinks(linksData);
+          console.log("Links Fetched Successfully");
+          handleSuccess("Links Fetched Successfully")
         } else {
-          toast.error(result.message || "Failed to fetch links");
+          handleSuccess(result.message || "Failed to fetch links");
         }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching links:", error);
-        toast.error("Failed to fetch links");
+        handleError("Failed to fetch links");
         setLoading(false);
       }
     };
@@ -169,6 +171,7 @@ function LinksTable({ openDeleteModal }) {
       if (response.ok) {
         setLinks(links.filter((link) => link.id !== selectedLinkId));
         handleSuccess("Link deleted successfully");
+        console.log("Link deleted successfully");
       } else {
         const result = await response.json();
         handleError(result.message || "Failed to delete the link");
@@ -176,6 +179,7 @@ function LinksTable({ openDeleteModal }) {
     } catch (error) {
       console.error("Error deleting link:", error);
       handleError("Failed to delete the link");
+      console.log("Failed to delete the link");
     } finally {
       setDeleteModalOpen(false);
     }

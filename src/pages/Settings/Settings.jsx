@@ -5,14 +5,15 @@ import {ToastContainer } from "react-toastify";
 import { handleError, handleSuccess } from '../../utils';
 import "react-toastify/dist/ReactToastify.css";
 import "./Settings.css";
-import { use } from "react";
 import { useNavigate } from "react-router-dom";
+import cross from "../../assets/cross.svg";
 
 export default function Settings() {
   const uri = `${import.meta.env.VITE_BACKEND_URL}`;
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,7 +24,6 @@ export default function Settings() {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem("token"); // Retrieve the token from local storage
-        console.log(token);
         const response = await fetch(`${uri}/api/v1/profile`, {
           method: "GET",
           headers: {
@@ -36,12 +36,12 @@ export default function Settings() {
           throw new Error("Failed to fetch profile");
         }
 
-        const data = await response.json();
-        console.log(data);
+        const result = await response.json();
+        console.log(result);
         setFormData({
-          name: data.name || "",
-          email: data.email || "",
-          mobileNo: data.mobileNo || "",
+          name: result.data.name || "",
+          email: result.data.email || "",
+          mobileNo: result.data.mobileNo || "",
         });
         console.log("Form data updated successfully.");
       } catch (error) {
@@ -158,7 +158,7 @@ export default function Settings() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Email Id</label>
+              <label htmlFor="email">Email&nbsp;Id</label>
               <input
                 id="email"
                 name="email"
@@ -170,7 +170,7 @@ export default function Settings() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="mobile">Mobile No.</label>
+              <label htmlFor="mobile">Mobile&nbsp;No.</label>
               <input
                 id="mobileNo"
                 name="mobileNo"
@@ -191,19 +191,39 @@ export default function Settings() {
               </button>
 
               <button
-                type="button"
-                variant="destructive"
-                className="delete-button"
-                onClick={handleDeleteAccount}
-                disabled={isLoading}
-              >
-                {isLoading ? "Processing..." : "Delete Account"}
-              </button>
+  type="button"
+  className="delete-button"
+  onClick={() => setIsDeleteModalOpen(true)}
+  disabled={isLoading}
+>
+  {isLoading ? "Processing..." : "Delete Account"}
+</button>
+
             </div>
           </form>
           <ToastContainer />
         </CardContent>
       </Card>
+      {isDeleteModalOpen && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <img
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="crossIcon"
+                src={cross}
+                alt="Close"
+                height={18}
+              />
+      <div className="modal-body">Are you sure, you want to delete the account?</div>
+     
+      <div className="modal-footer">
+        <button onClick={handleDeleteAccount} className="modal-button-primary">Yes</button>
+        <button onClick={() => setIsDeleteModalOpen(false)} className="modal-button-secondary">No</button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

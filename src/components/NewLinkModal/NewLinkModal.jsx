@@ -53,6 +53,19 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
     }));
   };
 
+  const validateUrl = (str) => {
+    const pattern = new RegExp(
+      '^(https?:\\/\\/)?' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$','i' // fragment locator
+    );
+    return !!pattern.test(str);
+  };
+  
+
   const handleExpirationToggle = (e) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -72,7 +85,7 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
 
     // Validate the form data
     const newErrors = {
-      destinationUrl: !formData.destinationUrl,
+      destinationUrl: !validateUrl(formData.destinationUrl),
       remarks: !formData.remarks,
     };
     setErrors(newErrors);
@@ -101,7 +114,7 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
         if (result.success) {
           handleSuccess("Link created successfully");
           onSubmit(result.data);
-
+          console.log("Link created successfully");
           // Reset form data and close the modal
           setFormData({
             destinationUrl: "",
@@ -116,6 +129,11 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
       } catch (error) {
         console.error("Error creating link:", error);
         handleError("Failed to create link");
+      }
+    }
+    else {
+      if (newErrors.destinationUrl) {
+        handleError("Please enter a valid URL.");
       }
     }
   };
@@ -174,6 +192,7 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
       </DialogTitle>
 
       <DialogContent sx={{ padding: isSmallScreen ? 2 : 3 }}>
+      <ToastContainer />
         <form onSubmit={handleSubmit} className="space-y-6">
           <TextField
             fullWidth
@@ -185,7 +204,7 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
             required
             error={errors.destinationUrl}
             helperText={
-              errors.destinationUrl ? "Destination URL is required" : ""
+              errors.destinationUrl ? "Please enter a valid URL" : ""
             }
             sx={{ mt: 2 }}
           />
@@ -256,7 +275,7 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
               display: "flex",
               justifyContent: "space-between",
               marginTop: "24px",
-             backgroundColor: "#3B3C511A",
+            
               flexDirection: isSmallScreen ? "column" : "row", // Stack buttons on small screens
               gap: isSmallScreen ? "16px" : "0",
             }}
@@ -264,9 +283,9 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
             <Button
               onClick={handleClear}
               sx={{
-                color: "#6a6a6a",
+                color: "#6A6A6A",
                 "&:hover": {
-                  backgroundColor: "#f5f5f5",
+                  backgroundColor: "#3B3C511A",
                   color: "#343446",
                 },
                 fontSize: "1.1rem",
@@ -291,7 +310,7 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
               Create new
             </Button>
           </div>
-          <ToastContainer />
+       
         </form>
       </DialogContent>
     </Dialog>
@@ -299,4 +318,3 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
 }
 
 export default NewLinkModal;
-

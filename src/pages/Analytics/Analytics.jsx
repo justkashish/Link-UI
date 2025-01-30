@@ -53,6 +53,18 @@ export default function Analytics() {
     setCurrentPage(page); // Change the current page
   };
 
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  };
+
   return (
     <div className="analytics-container">
       <div className="table-container">
@@ -72,7 +84,7 @@ export default function Analytics() {
             {data.length > 0 ? (
               data.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.createdAt}</td>
+                  <td>{formatDate(item.createdAt)}</td>
                   <td className="link-cell">{item.url}</td>
                   <td className="link-cell">{item.shortUrl}</td>
                   <td>{item.ipAddress}</td>
