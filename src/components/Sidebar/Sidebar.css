@@ -25,6 +25,10 @@
     align-items: center;
 }
 
+.navbar-component {
+    width: 13vw;
+}
+
 .navbar-list li a {
     color: #3b3c51;
     text-decoration: none;
@@ -36,7 +40,7 @@
     font-size: 16px;
 }
 
-.navbar-list li a:hover {
+.navbar-component:hover {
     color: #1b48da;
     background: #f3f7fd;
     border-radius: 6px;

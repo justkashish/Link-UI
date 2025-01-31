@@ -4,9 +4,11 @@ import { ToastContainer } from "react-toastify";
 import { handleError, handleSuccess } from "../../utils";
 import cuvette from "../../assets/cuvette.png";
 import "./Login.css";
+// import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Login() {
   const uri = `${import.meta.env.VITE_BACKEND_URL}`;
+  // const [showPassword, setShowPassword] = useState(false);
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
@@ -18,6 +20,10 @@ function Login() {
     copyLoginInfo[name] = value;
     setLoginInfo(copyLoginInfo);
   };
+
+  // const togglePasswordVisibility = () => {
+  //   setShowPassword(!showPassword);
+  // };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -87,7 +93,7 @@ function Login() {
                 value={loginInfo.email}
               />
             </div>
-            <div>
+            <div className="password-input-container">
               <input
                 onChange={handleChange}
                 type="password"
@@ -95,6 +101,9 @@ function Login() {
                 placeholder="Enter your Password..."
                 value={loginInfo.password}
               />
+              {/* <span className="password-toggle" onClick={togglePasswordVisibility}>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span> */}
             </div>
             <button className="login-button" type="submit">
               Login

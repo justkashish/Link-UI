@@ -11,28 +11,28 @@ const Sidebar = () => {
     <div className="sidebar-container">
       <nav className="resNavbar">
         <ul className="navbar-list">
-          <li>
+          <li className="navbar-component">
             <Link to="/home/dashboard">
               <img className="icons" src={icon1} alt="Dashboard Icon" />
-              <span>Dashboard</span>
+              <div>Dashboard</div>
             </Link>
           </li>
-          <li>
+          <li className="navbar-component">
             <Link to="/home/links">
               <img className="icons" src={icon3} alt="Links Icon" />
-              <span>Links</span>
+              <div>Links</div>
             </Link>
           </li>
-          <li>
+          <li className="navbar-component">
             <Link to="/home/analytics">
               <img className="icons" src={icon2} alt="Analytics Icon" />
-              <span>Analytics</span>
+              <div>Analytics</div>
             </Link>
           </li>
-          <li>
+          <li className="navbar-component">
             <Link to="/home/settings">
               <img className="icons" src={settings} alt="Settings Icon" />
-              <span>Settings</span>
+              <div>Settings</div>
             </Link>
           </li>
         </ul>

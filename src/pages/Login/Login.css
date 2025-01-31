@@ -61,7 +61,7 @@ input {
     margin-bottom: 15px;
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #3B3C51;
+    /* border: 1px solid #3B3C51; */
     border-radius: 5px;
 }
 
@@ -95,6 +95,123 @@ a:hover {
 .error {
     color: red;
     margin-top: 10px;
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    .login-container {
+        display: flex;
+        height: 100vh;
+        position: relative;
+        width: 100vw;
+    }
+    .top-right-buttons {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+    .top-right-buttons .signup-button,
+    .top-right-buttons .login-button {
+        margin-left: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .top-right-buttons .login-button:hover {
+        background-color: #0056b3;
+    }
+    .left-section {
+        flex: 1;
+        background: url('../../assets/background.png') no-repeat center center;
+        background-size: cover;
+    }
+    .right-section {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+    }
+    .form-container {
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+    }
+    h2 {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    input {
+        margin-bottom: 15px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #3B3C51;
+        border-radius: 5px;
+    }
+    /* ✅ Password input container */
+    .password-input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    /* ✅ Password input with padding for the icon */
+    .password-input-container input {
+        width: 100%;
+        padding: 10px;
+        padding-right: 40px;
+        /* Space for the eye icon */
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    /* ✅ Eye icon inside the input */
+    .eye-icon {
+        position: absolute;
+        /* Fix: Changed from fixed to absolute */
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #666;
+        font-size: 18px;
+    }
+    .eye-icon:hover {
+        color: #333;
+    }
+}
+
+.password-input-container input {
+    width: 100%;
+    padding: 10px;
+    padding-right: 40px;
+    /* Space for the eye icon */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #666;
+    font-size: 18px;
+}
+
+.eye-icon:hover {
+    color: #333;
 }
 
 

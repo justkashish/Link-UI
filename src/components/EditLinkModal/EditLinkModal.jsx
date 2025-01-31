@@ -128,6 +128,7 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      fullHeight
       PaperProps={{
         style: {
           borderRadius: "8px",
