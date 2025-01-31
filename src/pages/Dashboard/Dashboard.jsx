@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react"
 import { Bar, BarChart, ResponsiveContainer, Tooltip, YAxis } from "recharts"
-import "./dashboard.css"
+import "./Dashboard.css"
 
 export default function Dashboard() {
   const uri = import.meta.env.VITE_BACKEND_URL
