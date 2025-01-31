@@ -177,6 +177,8 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          backgroundColor:"#3B3C51",
+          color:"white",
           fontSize: isSmallScreen ? "1.2rem" : "1.5rem", // Adjust font size for small screens
         }}
       >
@@ -275,7 +277,6 @@ function NewLinkModal({ isOpen, onClose, onSubmit }) {
               display: "flex",
               justifyContent: "space-between",
               marginTop: "24px",
-            
               flexDirection: isSmallScreen ? "column" : "row", // Stack buttons on small screens
               gap: isSmallScreen ? "16px" : "0",
             }}

@@ -19,39 +19,39 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
   const token = localStorage.getItem("token")
 
   // Fetch link details when modal opens
-  useEffect(() => {
-    if (isOpen && linkId) {
-      fetchLinkDetails()
-    }
-  }, [isOpen, linkId])
+//   useEffect(() => {
+//     if (isOpen && linkId) {
+//       fetchLinkDetails()
+//     }
+//   }, [isOpen, linkId])
 
-  const fetchLinkDetails = async () => {
-    try {
-      const response = await fetch(`${uri}/api/v1/link/${linkId}`, {
-          method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
+//   const fetchLinkDetails = async () => {
+//     try {
+//       const response = await fetch(`${uri}/api/v1/link/${linkId}`, {
+//           method: "GET",
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Content-Type": "application/json",
+//         },
+//       })
 
-      const result = await response.json()
-console.log(result);
-      if (result.success) {
-        setFormData({
-          destinationUrl: result.data.url,
-          remarks: result.data.remark,
-          isExpirationEnabled: !!result.data.expirationDate,
-          expirationDate: result.data.expirationDate ? new Date(result.data.expirationDate) : new Date(),
-        })
-      } else {
-        handleError("Failed to fetch link details")
-      }
-    } catch (error) {
-      console.error("Error fetching link details:", error)
-      handleError("Failed to fetch link details")
-    }
-  }
+//       const result = await response.json()
+// console.log(result);
+//       if (result.success) {
+//         setFormData({
+//           destinationUrl: result.data.url,
+//           remarks: result.data.remark,
+//           isExpirationEnabled: !!result.data.expirationDate,
+//           expirationDate: result.data.expirationDate ? new Date(result.data.expirationDate) : new Date(),
+//         })
+//       } else {
+//         handleError("Failed to fetch link details")
+//       }
+//     } catch (error) {
+//       console.error("Error fetching link details:", error)
+//       handleError("Failed to fetch link details")
+//     }
+//   }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -241,6 +241,7 @@ console.log(result);
                   color: "#343446",
                 },
                 fontSize: "1.1rem",
+                textTransform:"none"
               }}
             >
               Clear
@@ -255,6 +256,7 @@ console.log(result);
                 },
                 fontSize: "1.1rem",
                 px: 4,
+                textTransform:"none"
               }}
             >
               Save
