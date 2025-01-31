@@ -33,35 +33,25 @@ export default function Dashboard() {
       const result = await response.json();
       console.log("Fetched Click Status:", result); // Properly logs the data
 
-      if (!result.success || !result.data || !Array.isArray(result.data.items)) {
+      if (!result.success || !result.data ) {
         console.error("Error: API returned invalid data", result);
         return; // Exit early if data is not valid
       }
 
-      if (result.success) {
-        const linksData = result.data.items.map((item) => ({
-          id: item._id,
-          timestamp: new Date(item.createdAt).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false, // 24-hour format
-          }),
-          originalLink: item.url,
-          shortLink: item.shortUrl,
-          remarks: item.remark,
-          clicks: item.totalClicks || 0,// ✅ Ensure 'clicks' are correctly mapped
-          status: item.status,
-          rawDate: new Date(item.createdAt),
-        }));
-
-        setLinks(linksData); // ✅ Update state
-      } else {
-        handleError(result.message || "Failed to fetch links");
-      }
-      
+      const transformedData = {
+        totalClicks: result.data.totalClicks || 0,
+        dateWiseClicks: result.data.dateWiseClicks.map((item) => ({
+          date: item.date,
+          clicks: item.totalClicks,
+        })),
+        deviceClicks: result.data.deviceWiseClicks.map((item) => ({
+          device: item.device,
+          clicks: item.totalClicks,
+        })),
+      };
+  
+      return transformedData; // ✅ Return correctly formatted data
+  
     } catch (error) {
       console.error("Error fetching analytics:", error.message);
       return null;

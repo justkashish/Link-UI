@@ -159,7 +159,7 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
             value={formData.destinationUrl}
             onChange={handleInputChange}
             placeholder="https://web.whatsapp.com/"
-            required
+           
             error={errors.destinationUrl}
             helperText={errors.destinationUrl ? "Destination URL is required" : ""}
             sx={{ mt: 2 }}
@@ -176,14 +176,14 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
             value={formData.remarks}
             onChange={handleInputChange}
             placeholder="Add remarks"
-            required
+           
             multiline
             rows={4}
             error={errors.remarks}
             helperText={errors.remarks ? "Remarks are required" : ""}
             sx={{ mt: 3 }}
             InputLabelProps={{
-              required: true,
+              
               style: { color: errors.remarks ? "red" : "#343446" },
             }}
           />
