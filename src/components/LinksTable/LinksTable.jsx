@@ -25,6 +25,7 @@ function LinksTable({ openDeleteModal }) {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLinkId, setSelectedLinkId] = useState(null);
+  const [selectedLink, setSelectedLink] = useState(null);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -144,15 +145,22 @@ function LinksTable({ openDeleteModal }) {
     return `${text.substring(0, maxLength)}...`;
   };
 
+  const handleEditClick = (link) =>{
+    setSelectedLink(link);
+    setIsModalOpen(true);
+  }
+
+  const handleEditSuccess = (updatedLink) => {
+    setLinks((prevLinks) =>
+      prevLinks.map((link) => (link.id === updatedLink.id ? updatedLink : link))
+    );
+    setIsModalOpen(false);
+  };
+
   const handleDeleteClick = (id) => {
     setSelectedLinkId(id);
     setDeleteModalOpen(true);
   };
-
-  const handleEditClick = (id) =>{
-    setSelectedLinkId(id);
-    setIsModalOpen(true);
-  }
 
   const handleDeleteConfirm = async () => {
     try {
@@ -384,7 +392,7 @@ function LinksTable({ openDeleteModal }) {
                       alt="Edit"
                       className="h-6 w-6 cursor-pointer"
                       title="Edit"
-                      onClick={() => handleEditClick(link.id)}
+                      onClick={() => handleEditClick(link)}
                     />
                     <img
                       src={deleteIcon}
@@ -406,11 +414,9 @@ function LinksTable({ openDeleteModal }) {
       <EditLinkModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={(updatedLink) => {
-          // Handle the updated link data
-          console.log(updatedLink);
-        }}
+        onSubmit={handleEditSuccess}
         linkId={selectedLinkId}
+        linkDetails={selectedLink}
       />
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}

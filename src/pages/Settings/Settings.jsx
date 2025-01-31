@@ -80,7 +80,6 @@ export default function Settings() {
         throw new Error("Failed to update profile");
       }
       console.log("Your profile has been updated.");
-
       handleSuccess("Your profile has been updated.");
     } catch (error) {
       handleError("Failed to update profile. Please try again.");

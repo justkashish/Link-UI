@@ -7,7 +7,7 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 import { ToastContainer } from "react-toastify"
 import { handleError, handleSuccess } from "../../utils"
 
-function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
+function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
   const uri = `${import.meta.env.VITE_BACKEND_URL}`
   const [formData, setFormData] = useState({
     destinationUrl: "",
@@ -16,42 +16,20 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
     expirationDate: new Date(),
   })
   const [errors, setErrors] = useState({ destinationUrl: false, remarks: false })
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem("token");
 
-  // Fetch link details when modal opens
-//   useEffect(() => {
-//     if (isOpen && linkId) {
-//       fetchLinkDetails()
-//     }
-//   }, [isOpen, linkId])
-
-//   const fetchLinkDetails = async () => {
-//     try {
-//       const response = await fetch(`${uri}/api/v1/link/${linkId}`, {
-//           method: "GET",
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           "Content-Type": "application/json",
-//         },
-//       })
-
-//       const result = await response.json()
-// console.log(result);
-//       if (result.success) {
-//         setFormData({
-//           destinationUrl: result.data.url,
-//           remarks: result.data.remark,
-//           isExpirationEnabled: !!result.data.expirationDate,
-//           expirationDate: result.data.expirationDate ? new Date(result.data.expirationDate) : new Date(),
-//         })
-//       } else {
-//         handleError("Failed to fetch link details")
-//       }
-//     } catch (error) {
-//       console.error("Error fetching link details:", error)
-//       handleError("Failed to fetch link details")
-//     }
-//   }
+  useEffect(() => {
+    if (isOpen && linkDetails) {
+      setFormData({
+        destinationUrl: linkDetails.originalLink || "",
+        remarks: linkDetails.remarks || "",
+        isExpirationEnabled: !!linkDetails.expirationDate,
+        expirationDate: linkDetails.expirationDate
+          ? new Date(linkDetails.expirationDate)
+          : new Date(),
+      });
+    }
+  }, [isOpen, linkDetails]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -82,23 +60,24 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
       destinationUrl: !formData.destinationUrl,
       remarks: !formData.remarks,
     }
-    setErrors(newErrors)
+    setErrors(newErrors);
 
     if (!newErrors.destinationUrl && !newErrors.remarks) {
-      const data = {
+      const updatedData = {
+        id: linkDetails?.id, // Ensure ID is passed for reference
         url: formData.destinationUrl,
         remark: formData.remarks,
         expirationDate: formData.isExpirationEnabled ? formData.expirationDate : null,
-      }
+      };
 
       try {
-        const response = await fetch(`${uri}/api/v1/link/edit/${linkId}`, {
+        const response = await fetch(`${uri}/api/v1/link/edit/${linkDetails?.id}`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(updatedData),
         })
 
         const result = await response.json()
@@ -118,7 +97,12 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
   }
 
   const handleClear = () => {
-    fetchLinkDetails() // Reset to original data
+    setFormData({
+      destinationUrl: linkDetails?.originalLink || "",
+      remarks: linkDetails?.remarks || "",
+      isExpirationEnabled: !!linkDetails?.expirationDate,
+      expirationDate: linkDetails?.expirationDate ? new Date(linkDetails.expirationDate) : new Date(),
+    });
     setErrors({ destinationUrl: false, remarks: false })
   }
 
@@ -128,7 +112,6 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkId }) {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      fullHeight
       PaperProps={{
         style: {
           borderRadius: "8px",
