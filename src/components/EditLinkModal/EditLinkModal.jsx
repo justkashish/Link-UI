@@ -1,36 +1,36 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogTitle, DialogContent, IconButton, TextField, Switch, Button } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers"
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 import { ToastContainer } from "react-toastify"
 import { handleError, handleSuccess } from "../../utils"
 
 function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
-  const uri = `${import.meta.env.VITE_BACKEND_URL}`
+  const uri = `${import.meta.env.VITE_BACKEND_URL}` // Backend API URL
   const [formData, setFormData] = useState({
-    destinationUrl: "",
-    remarks: "",
-    isExpirationEnabled: false,
-    expirationDate: new Date(),
+    destinationUrl: "", // Stores the destination URL
+    remarks: "", // Stores remarks for the link
+    isExpirationEnabled: false, // Flag for expiration state
+    expirationDate: new Date(), // Expiration date for the link
   })
-  const [errors, setErrors] = useState({ destinationUrl: false, remarks: false })
-  const token = localStorage.getItem("token");
+  const [errors, setErrors] = useState({ destinationUrl: false, remarks: false }) // Form error states
+  const token = localStorage.getItem("token") // Fetch the JWT token for authentication
 
+  // Effect hook to populate form data when the modal opens or linkDetails change
   useEffect(() => {
     if (isOpen && linkDetails) {
       setFormData({
         destinationUrl: linkDetails.originalLink || "",
         remarks: linkDetails.remarks || "",
         isExpirationEnabled: !!linkDetails.expirationDate,
-        expirationDate: linkDetails.expirationDate
-          ? new Date(linkDetails.expirationDate)
-          : new Date(),
-      });
+        expirationDate: linkDetails.expirationDate ? new Date(linkDetails.expirationDate) : new Date(),
+      })
     }
-  }, [isOpen, linkDetails]);
+  }, [isOpen, linkDetails])
 
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData((prevState) => ({
@@ -39,6 +39,7 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
     }))
   }
 
+  // Handle the toggle for expiration date
   const handleExpirationToggle = (e) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -46,6 +47,7 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
     }))
   }
 
+  // Handle changes to the expiration date
   const handleDateChange = (newDate) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -53,68 +55,80 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
     }))
   }
 
+  // Submit form data
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    // Basic form validation for required fields
     const newErrors = {
       destinationUrl: !formData.destinationUrl,
       remarks: !formData.remarks,
     }
-    setErrors(newErrors);
+    setErrors(newErrors)
 
     if (!newErrors.destinationUrl && !newErrors.remarks) {
+      // Prepare data for updating the link
       const updatedData = {
-        id: linkDetails?.id, // Ensure ID is passed for reference
+        id: linkDetails?.id, // Pass the link ID for reference
         url: formData.destinationUrl,
         remark: formData.remarks,
         expirationDate: formData.isExpirationEnabled ? formData.expirationDate : null,
-      };
+      }
 
       try {
+        // Make the API call to update the link
         const response = await fetch(`${uri}/api/v1/link/edit/${linkDetails?.id}`, {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // Authorization token for API request
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(updatedData),
+          body: JSON.stringify(updatedData), // Pass the updated data in the body
         })
 
         const result = await response.json()
 
+        // Handle success or failure based on the API response
         if (result.success) {
-          handleSuccess("Link updated successfully")
-          onSubmit(result.data)
-          onClose()
+          handleSuccess("Link updated successfully") // Show success toast
+          onSubmit(result.data) // Notify parent component with updated data
+          onClose() // Close the modal
         } else {
-          handleError(result.message || "Failed to update link")
+          handleError(result.message || "Failed to update link") // Show error toast
         }
       } catch (error) {
         console.error("Error updating link:", error)
-        handleError("Failed to update link")
+        handleError("Failed to update link") // Show error toast in case of network/API failure
       }
     }
   }
 
+  // Clear form data and reset error states
   const handleClear = () => {
     setFormData({
       destinationUrl: linkDetails?.originalLink || "",
       remarks: linkDetails?.remarks || "",
       isExpirationEnabled: !!linkDetails?.expirationDate,
       expirationDate: linkDetails?.expirationDate ? new Date(linkDetails.expirationDate) : new Date(),
-    });
-    setErrors({ destinationUrl: false, remarks: false })
+    })
+    setErrors({ destinationUrl: false, remarks: false }) // Reset errors
   }
 
   return (
     <Dialog
       open={isOpen}
-      onClose={onClose}
+      onClose={onClose} // Close the modal when the background is clicked or the close button is clicked
       maxWidth="sm"
       fullWidth
+      sx={{
+        "& .MuiDialog-paper": {
+          height: "90vh", // Set the dialog height to 90% of the viewport height
+          margin: "20px", // Add margin around the dialog
+        },
+      }}
       PaperProps={{
         style: {
-          borderRadius: "8px",
+          borderRadius: "8px", // Rounded corners for the dialog
         },
       }}
     >
@@ -134,8 +148,9 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 3 }}>
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <DialogContent sx={{ p: 3, display: "flex", flexDirection: "column", flex: 1 }}>
+        <form onSubmit={handleSubmit} className="space-y-6" style={{ flex: 1 }}>
+          {/* Destination URL field */}
           <TextField
             fullWidth
             label="Destination Url"
@@ -143,7 +158,6 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
             value={formData.destinationUrl}
             onChange={handleInputChange}
             placeholder="https://web.whatsapp.com/"
-           
             error={errors.destinationUrl}
             helperText={errors.destinationUrl ? "Destination URL is required" : ""}
             sx={{ mt: 2 }}
@@ -153,6 +167,7 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
             }}
           />
 
+          {/* Remarks field */}
           <TextField
             fullWidth
             label="Remarks"
@@ -160,18 +175,17 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
             value={formData.remarks}
             onChange={handleInputChange}
             placeholder="Add remarks"
-           
             multiline
             rows={4}
             error={errors.remarks}
             helperText={errors.remarks ? "Remarks are required" : ""}
             sx={{ mt: 3 }}
             InputLabelProps={{
-              
               style: { color: errors.remarks ? "red" : "#343446" },
             }}
           />
 
+          {/* Expiration toggle switch */}
           <div
             style={{
               display: "flex",
@@ -183,75 +197,79 @@ function EditLinkModal({ isOpen, onClose, onSubmit, linkDetails }) {
             <span style={{ color: "#343446", fontSize: "1.1rem" }}>Link Expiration</span>
             <Switch
               checked={formData.isExpirationEnabled}
-              onChange={handleExpirationToggle}
+              onChange={handleExpirationToggle} // Toggle expiration state
               sx={{
                 "& .MuiSwitch-switchBase.Mui-checked": {
-                  color: "#1b48da",
+                  color: "#1b48da", // Custom color for the checked state
                 },
                 "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                  backgroundColor: "#1b48da",
+                  backgroundColor: "#1b48da", // Custom color for the track in the checked state
                 },
               }}
             />
           </div>
 
+          {/* Date Picker for expiration date */}
           {formData.isExpirationEnabled && (
             <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
+              <DateTimePicker
                 value={formData.expirationDate}
-                onChange={handleDateChange}
+                onChange={handleDateChange} // Update the expiration date
                 textField={(params) => <TextField {...params} fullWidth sx={{ mt: 2 }} />}
                 components={{
                   OpenPickerIcon: CalendarTodayIcon,
                 }}
-                minDate={new Date()}
+                minDateTime={new Date()} // Ensure the date is not in the past
               />
             </LocalizationProvider>
           )}
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: "24px",
-            }}
-          >
-            <Button
-              onClick={handleClear}
-              sx={{
-                color: "#6a6a6a",
-                "&:hover": {
-                  backgroundColor: "#f5f5f5",
-                  color: "#343446",
-                },
-                fontSize: "1.1rem",
-                textTransform:"none"
-              }}
-            >
-              Clear
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                backgroundColor: "#1b48da",
-                "&:hover": {
-                  backgroundColor: "#1539b3",
-                },
-                fontSize: "1.1rem",
-                px: 4,
-                textTransform:"none"
-              }}
-            >
-              Save
-            </Button>
-          </div>
-          <ToastContainer />
+          <ToastContainer /> {/* Toast notifications for success/error */}
         </form>
       </DialogContent>
+
+      {/* Save and Clear buttons */}
+      <div
+        style={{
+          padding: "16px 24px",
+          backgroundColor: "rgba(59, 60, 81, 0.1)",
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "auto",
+        }}
+      >
+        <Button
+          onClick={handleClear} // Reset the form to initial state
+          sx={{
+            color: "#6a6a6a",
+            "&:hover": {
+              backgroundColor: "#f5f5f5",
+              color: "#343446",
+            },
+            fontSize: "1.1rem",
+            textTransform: "none",
+          }}
+        >
+          Clear
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          onClick={handleSubmit} // Submit form data to the API
+          sx={{
+            backgroundColor: "#1b48da",
+            "&:hover": {
+              backgroundColor: "#1539b3",
+            },
+            fontSize: "1.1rem",
+            px: 4,
+            textTransform: "none",
+          }}
+        >
+          Save
+        </Button>
+      </div>
     </Dialog>
   )
 }
 
 export default EditLinkModal
-

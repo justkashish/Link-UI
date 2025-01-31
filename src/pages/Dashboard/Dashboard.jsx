@@ -1,21 +1,25 @@
-import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import "./Dashboard.css";
+import { useEffect, useState, useCallback } from "react"
+import { Bar, BarChart, ResponsiveContainer, Tooltip, YAxis } from "recharts"
+import "./dashboard.css"
 
 export default function Dashboard() {
-  const uri = import.meta.env.VITE_BACKEND_URL;
+  const uri = import.meta.env.VITE_BACKEND_URL
   const [data, setData] = useState({
     totalClicks: 0,
     dateWiseClicks: [],
-    deviceClicks: [],
-  });
+    deviceClicks: [
+      { device: "Mobile", clicks: 0 },
+      { device: "Desktop", clicks: 0 },
+      { device: "Tablet", clicks: 0 },
+    ],
+  })
 
-  const fetchAnalyticsData = async () => {
+  const fetchAnalyticsData = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token"); // Retrieve token
+      const token = localStorage.getItem("token")
       if (!token) {
-        console.error("No token found! Please log in again.");
-        return null; // Prevent API call if no token is present
+        console.error("No token found! Please log in again.")
+        return null
       }
 
       const response = await fetch(`${uri}/api/v1/linkStats/getClickStats`, {
@@ -24,54 +28,89 @@ export default function Dashboard() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`API Error: ${response.statusText} (${response.status})`);
+        throw new Error(`API Error: ${response.statusText} (${response.status})`)
       }
 
-      const result = await response.json();
-      console.log("Fetched Click Status:", result); // Properly logs the data
+      const result = await response.json()
 
-      if (!result.success || !result.data ) {
-        console.error("Error: API returned invalid data", result);
-        return; // Exit early if data is not valid
+      if (!result.success || !result.data) {
+        console.error("Error: API returned invalid data", result)
+        return
       }
+  // Normalize device names and aggregate clicks
+      const deviceData = result.data.deviceWiseClicks || []
+    
+      const deviceCounts = {
+        Mobile: 0,
+        Desktop: 0,
+        Tablet: 0,
+      }
+
+      // Aggregate clicks for each device type
+      deviceData.forEach((item) => {
+        const deviceName = item.device.toLowerCase()
+        if (deviceName.includes("mobile") || deviceName.includes("phone")) {
+          deviceCounts.Mobile += item.totalClicks
+        } else if (deviceName.includes("desktop") || deviceName.includes("laptop")) {
+          deviceCounts.Desktop += item.totalClicks
+        } else if (deviceName.includes("tablet") || deviceName.includes("ipad")) {
+          deviceCounts.Tablet += item.totalClicks
+        }
+      })
+
+       // Create the final device clicks array maintaining order
+       const transformedDeviceClicks = [
+        { device: "Mobile", clicks: deviceCounts.Mobile },
+        { device: "Desktop", clicks: deviceCounts.Desktop },
+        { device: "Tablet", clicks: deviceCounts.Tablet },
+      ]
 
       const transformedData = {
         totalClicks: result.data.totalClicks || 0,
-        dateWiseClicks: result.data.dateWiseClicks.map((item) => ({
+        dateWiseClicks: (result.data.dateWiseClicks || []).map((item) => ({
           date: item.date,
           clicks: item.totalClicks,
         })),
-        deviceClicks: result.data.deviceWiseClicks.map((item) => ({
-          device: item.device,
-          clicks: item.totalClicks,
-        })),
-      };
-  
-      return transformedData; // ✅ Return correctly formatted data
-  
+        deviceClicks: transformedDeviceClicks,
+      }
+
+      return transformedData
     } catch (error) {
-      console.error("Error fetching analytics:", error.message);
-      return null;
+      console.error("Error fetching analytics:", error.message)
+      return null
     }
-  };
+  }, [])
 
   useEffect(() => {
     const loadData = async () => {
-      const analyticsData = await fetchAnalyticsData();
+      const analyticsData = await fetchAnalyticsData()
       if (analyticsData) {
-        setData(analyticsData);
+        setData(analyticsData)
       }
-    };
+    }
 
-    loadData();
-    
-    // Refresh data every 5 minutes
-    const interval = setInterval(loadData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
+    loadData()
+    const interval = setInterval(loadData, 5 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [fetchAnalyticsData])
+
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const value = payload[0].value
+      const name = payload[0].payload.device || payload[0].payload.date
+      return (
+        <div className="custom-tooltip">
+          <p>{ `${name}:${value}`}</p>
+          </div>
+      )
+    }
+    return null
+  }
+
 
   return (
     <div className="dashboard">
@@ -86,40 +125,66 @@ export default function Dashboard() {
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart
-                data={data.dateWiseClicks || []} // Ensure no crash if undefined
+                data={data.dateWiseClicks}
                 layout="vertical"
                 margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="date" type="category" tick={{ fontSize: 14 }} />
-                <Tooltip />
-                <Bar dataKey="clicks" fill="#0066FF" radius={[0, 4, 4, 0]} />
-              </BarChart>
+                <YAxis
+                  dataKey="date"
+                  type="category"
+                  tick={{ fontSize: 16, fill: "181820",fontWeight: 600 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} cursor={false} />
+                <Bar
+                  dataKey="clicks"
+                  fill="#1B48DA"
+                  radius={[0, 4, 4, 0]}
+                  barSize={20}
+                  label={{
+                    position: "right",
+                    fill: "#181820",
+                    fontSize: 16,
+                  }}
+                />
+                 </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         <div className="chart-card">
-          
           <h3>Click Devices</h3>
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart
-                data={data.deviceClicks || []} // Ensure no crash if undefined
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="device" type="category" tick={{ fontSize: 14 }} />
-                <Tooltip />
-                <Bar dataKey="clicks" fill="#0066FF" radius={[0, 4, 4, 0]} />
-              </BarChart>
+            <BarChart data={data.deviceClicks} layout="vertical" margin={{ top: 5, right: 30, left: 60, bottom: 5 }}>
+                <YAxis
+                  dataKey="device"
+                  type="category"
+                  tick={{ fontSize: 16, fill: "#181820", fontWeight: 600 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} cursor={false} />
+                <Bar
+                  dataKey="clicks"
+                  fill="#1B48DA"
+                  radius={[0, 4, 4, 0]}
+                  barSize={20}
+                  label={{
+                    position: "right",
+                    fill: "#181820",
+                    fontSize: 16,
+                    fontWeight: 600
+                  }}
+                />
+                 </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
+
+
