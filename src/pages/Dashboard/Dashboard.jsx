@@ -1,5 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import "./Dashboard.css";
 
 export default function Dashboard() {
@@ -13,7 +20,6 @@ export default function Dashboard() {
       { device: "Tablet", clicks: 0 },
     ],
   });
-
 
   const fetchAnalyticsData = useCallback(async () => {
     try {
@@ -32,7 +38,9 @@ export default function Dashboard() {
       });
 
       if (!response.ok) {
-        throw new Error(`API Error: ${response.statusText} (${response.status})`);
+        throw new Error(
+          `API Error: ${response.statusText} (${response.status})`
+        );
       }
 
       const result = await response.json();
@@ -49,25 +57,31 @@ export default function Dashboard() {
         const deviceName = item.device.toLowerCase();
         if (deviceName.includes("mobile") || deviceName.includes("phone")) {
           deviceCounts.Mobile += item.totalClicks;
-        } else if (deviceName.includes("desktop") || deviceName.includes("laptop")) {
+        } else if (
+          deviceName.includes("desktop") ||
+          deviceName.includes("laptop")
+        ) {
           deviceCounts.Desktop += item.totalClicks;
-        } else if (deviceName.includes("tablet") || deviceName.includes("ipad")) {
+        } else if (
+          deviceName.includes("tablet") ||
+          deviceName.includes("ipad")
+        ) {
           deviceCounts.Tablet += item.totalClicks;
         }
       });
 
-       // Sort the date-wise clicks in ascending order (oldest first)
-    let sortedDateClicks = (result.data.dateWiseClicks || [])
-    .map((item) => ({
-      date: item.date,
-      clicks: item.totalClicks,
-    }))
-    .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort so oldest comes first
+      // Sort the date-wise clicks in ascending order (oldest first)
+      let sortedDateClicks = (result.data.dateWiseClicks || [])
+        .map((item) => ({
+          date: item.date,
+          clicks: item.totalClicks,
+        }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort so oldest comes first
 
-  // Accumulate clicks such that the oldest date gets the total clicks for all dates after it
-  for (let i = 0; i < sortedDateClicks.length - 1; i++) {
-    sortedDateClicks[i].clicks += sortedDateClicks[i + 1].clicks; // Add the next day's clicks to the current day's clicks
-  }
+      // Accumulate clicks such that the oldest date gets the total clicks for all dates after it
+      for (let i = 0; i <= sortedDateClicks.length - 1; i++) {
+        sortedDateClicks[i].clicks += sortedDateClicks[i + 1].clicks; // Add the next day's clicks to the current day's clicks
+      }
       return {
         totalClicks: result.data.totalClicks || 0,
         dateWiseClicks: sortedDateClicks,
@@ -123,7 +137,8 @@ export default function Dashboard() {
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={data.dateWiseClicks} layout="vertical">
-                <XAxis type="number" hide={true} /> {/* Hiding X-axis instead of removing */}
+                <XAxis type="number" hide={true} />{" "}
+                {/* Hiding X-axis instead of removing */}
                 <YAxis
                   dataKey="date"
                   type="category"
@@ -156,7 +171,8 @@ export default function Dashboard() {
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={data.deviceClicks} layout="vertical">
-                <XAxis type="number" hide={true} /> {/* Keeping X-axis hidden for proper bar alignment */}
+                <XAxis type="number" hide={true} />{" "}
+                {/* Keeping X-axis hidden for proper bar alignment */}
                 <YAxis
                   dataKey="device"
                   type="category"
