@@ -56,19 +56,18 @@ export default function Dashboard() {
         }
       });
 
-      const sortedDateClicks = (result.data.dateWiseClicks || [])
-        .map((item) => ({
-          date: item.date,
-          clicks: item.totalClicks,
-        }))
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .reverse(); //Reverse to show newest on top
+       // Sort the date-wise clicks in ascending order (oldest first)
+    let sortedDateClicks = (result.data.dateWiseClicks || [])
+    .map((item) => ({
+      date: item.date,
+      clicks: item.totalClicks,
+    }))
+    .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort so oldest comes first
 
-        // Accumulate clicks for each date
-    for (let i = 1; i < sortedDateClicks.length; i++) {
-      sortedDateClicks[i].clicks += sortedDateClicks[i - 1].clicks; // Accumulate clicks
-    }
-
+  // Accumulate clicks such that the oldest date gets the total clicks for all dates after it
+  for (let i = 0; i < sortedDateClicks.length - 1; i++) {
+    sortedDateClicks[i].clicks += sortedDateClicks[i + 1].clicks; // Add the next day's clicks to the current day's clicks
+  }
       return {
         totalClicks: result.data.totalClicks || 0,
         dateWiseClicks: sortedDateClicks,
