@@ -77,15 +77,8 @@ export default function Dashboard() {
       date: item.date,
       clicks: item.totalClicks || 0,  // Ensure clicks are set to 0 if not present
     }))
-    .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort so oldest comes first
-
-  // Accumulate clicks such that the oldest date gets the total clicks for all dates after it
-  for (let i = 0; i < sortedDateClicks.length - 1; i++) {
-    // Ensure each item has clicks before adding
-    if (sortedDateClicks[i] && sortedDateClicks[i + 1]) {
-      sortedDateClicks[i].clicks += sortedDateClicks[i + 1].clicks; // Add the next day's clicks to the current day's clicks
-    }
-  }
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .reverse(); // Sort so oldest comes first
 
       return {
         totalClicks: result.data.totalClicks || 0,
