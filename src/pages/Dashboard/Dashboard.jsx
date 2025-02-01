@@ -64,6 +64,11 @@ export default function Dashboard() {
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .reverse(); //Reverse to show newest on top
 
+        // Accumulate clicks for each date
+    for (let i = 1; i < sortedDateClicks.length; i++) {
+      sortedDateClicks[i].clicks += sortedDateClicks[i - 1].clicks; // Accumulate clicks
+    }
+
       return {
         totalClicks: result.data.totalClicks || 0,
         dateWiseClicks: sortedDateClicks,
@@ -117,7 +122,7 @@ export default function Dashboard() {
         <div className="chart-card">
           <h3>Date-wise Clicks</h3>
           <div className="chart-wrapper">
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={data.dateWiseClicks} layout="vertical">
                 <XAxis type="number" hide={true} /> {/* Hiding X-axis instead of removing */}
                 <YAxis
