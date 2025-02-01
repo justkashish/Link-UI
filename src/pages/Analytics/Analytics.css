@@ -1,7 +1,6 @@
 /* Analytics Container */
 
 .analytics-container {
-    width: 82vw;
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -143,7 +142,8 @@
     .action-column {
         width: auto;
     }
-    .pagination-container {
-        justify-content: center;
+    .pagination {
+        position: fixed;
+        left: 41%;
     }
 }

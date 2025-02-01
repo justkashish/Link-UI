@@ -253,6 +253,10 @@ td {
     td {
         padding: 0.75rem;
     }
+    .pagination-container {
+        position: fixed;
+        left: 44%;
+    }
     .pagination-button {
         min-width: 2.25rem;
         height: 2.25rem;

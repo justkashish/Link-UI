@@ -88,8 +88,7 @@ export default function Analytics() {
             </tr>
           </thead>
           <tbody>
-            {/* Display data rows or a message if there's no data */}
-            {data.length > 0 ? (
+           {data.length > 0 ? (
               data.map((item, index) => (
                 <tr key={index}>
                   <td>{formatDate(item.createdAt)}</td>
@@ -101,7 +100,7 @@ export default function Analytics() {
               ))
             ) : (
               <tr>
-                <td colSpan="5">No data available</td> {/* Show no data message */}
+                <td colSpan="5">No data available</td> 
               </tr>
             )}
           </tbody>
